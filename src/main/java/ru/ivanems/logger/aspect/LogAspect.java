@@ -19,11 +19,15 @@ public class LogAspect {
         levelLog = Level.valueOf(loggerProps.getLevel());
     }
 
+    private void log (String message, Object... placeholders) {
+        logger.atLevel(levelLog).log(message, placeholders);
+    }
+
     @Before(
             "@annotation(ru.ivanems.logger.aspect.util.LogBeforeExecution)"
     )
     public void logBeforeExecution(JoinPoint joinPoint) {
-        logger.atLevel(levelLog).log("Method {} with arg {} is about to be executed", joinPoint.getSignature(), joinPoint.getArgs());
+        log("Method {} with arg {} is about to be executed", joinPoint.getSignature(), joinPoint.getArgs());
     }
 
     @AfterThrowing(
@@ -31,7 +35,7 @@ public class LogAspect {
             throwing = "exception"
     )
     public void logAfterThrowing(JoinPoint joinPoint, Exception exception) {
-        logger.atLevel(levelLog).log("Exception was thrown in method: {}, message: {}", joinPoint.getSignature(), exception.getMessage());
+        log("Exception was thrown in method: {}, message: {}", joinPoint.getSignature(), exception.getMessage());
     }
 
     @AfterReturning(
@@ -39,7 +43,7 @@ public class LogAspect {
             returning = "result"
     )
     public void logAfterReturning(JoinPoint joinPoint, Object result) {
-        logger.atLevel(levelLog).log("Method {} returned: {}", joinPoint.getSignature(), result);
+        log("Method {} returned: {}", joinPoint.getSignature(), result);
     }
 
     @Around(
@@ -50,11 +54,11 @@ public class LogAspect {
         try {
             return joinPoint.proceed();
         } catch (Throwable e) {
-            logger.atLevel(levelLog).log("Exception was thrown while executing method: {}, with message: {}", joinPoint.getSignature(), e.getMessage());
+            log("Exception was thrown while executing method: {}, with message: {}", joinPoint.getSignature(), e.getMessage());
             throw new RuntimeException(e);
         } finally {
             long executionTime = System.currentTimeMillis() - start;
-            logger.atLevel(levelLog).log("Method {} execution time: {} ms", joinPoint.getSignature(), executionTime);
+            log("Method {} execution time: {} ms", joinPoint.getSignature(), executionTime);
         }
     }
 
