@@ -7,6 +7,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.event.Level;
 import ru.ivanems.logger.config.LoggerProps;
+import ru.ivanems.logger.util.EnumUtils;
 
 @Aspect
 public class LogAspect {
@@ -16,7 +17,11 @@ public class LogAspect {
     private final Level levelLog;
 
     public LogAspect(LoggerProps loggerProps) {
-        levelLog = Level.valueOf(loggerProps.getLevel());
+        if (EnumUtils.isValidEnum(Level.class, loggerProps.getLevel())) {
+            levelLog = Level.valueOf(loggerProps.getLevel());
+        } else {
+            levelLog = Level.INFO;
+        }
     }
 
     private void log (String message, Object... placeholders) {
